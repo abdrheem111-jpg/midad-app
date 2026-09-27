@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>سبورة مِداد</title>
+  <meta name="description" content="سبورة رياضيات تفاعلية ذكية باللغة العربية: جبر، هندسة، أعداد، إحصاء، ذكاء اصطناعي متكيّف واستراتيجيات تدريس. تصميم وفكرة: أ. عبدالرحيم مبارك الرحبي" />
+  <meta name="author" content="أ. عبدالرحيم مبارك الرحبي" />
+  <meta name="theme-color" content="#111a22" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <link rel="stylesheet" href="assets/fonts/fonts.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-theme="chalk">
+
+  <!-- شاشة البداية -->
+  <div id="splash" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-logo">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#logo-mark"/></svg>
+      </div>
+      <h1>مِداد</h1>
+      <p>السبورة الرياضية الذكية</p>
+      <div class="splash-credit">تصميم وفكرة: <b>أ. عبدالرحيم مبارك الرحبي</b></div>
+    </div>
+  </div>
+
+  <!-- رمز الشعار -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="logo-mark" viewBox="0 0 64 64">
+      <rect x="4" y="8" width="56" height="40" rx="9" fill="none" stroke="currentColor" stroke-width="4"/>
+      <path d="M14 38 C 22 18, 28 18, 32 28 S 42 40, 50 18" fill="none" stroke="var(--accent)" stroke-width="4.5" stroke-linecap="round"/>
+      <circle cx="50" cy="18" r="4" fill="var(--accent-2)"/>
+      <path d="M24 56h16M32 48v8" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+  </svg>
+
+  <!-- الشريط العلوي -->
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><use href="#logo-mark"/></svg>
+      <div class="brand-text">
+        <strong>مِداد</strong>
+        <span>السبورة الرياضية الذكية</span>
+      </div>
+    </div>
+
+    <div class="top-center">
+      <div class="seg" id="quickActions">
+        <button class="icon-btn" data-act="undo" title="تراجع (Ctrl+Z)"></button>
+        <button class="icon-btn" data-act="redo" title="إعادة (Ctrl+Y)"></button>
+      </div>
+      <div class="seg page-seg">
+        <button class="icon-btn" data-act="prev-page" title="الصفحة السابقة"></button>
+        <span id="pageLabel" class="page-label">١ / ١</span>
+        <button class="icon-btn" data-act="next-page" title="الصفحة التالية"></button>
+        <button class="icon-btn" data-act="add-page" title="صفحة جديدة"></button>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" data-act="search" title="بحث سريع في الدروس والأدوات (Ctrl+K)"></button>
+      <button class="btn ghost ai-quick" data-act="ai-board" title="اطلب من المعلم الذكي قراءة ما على السبورة وحلّه"></button>
+      <div class="dropdown">
+        <button class="icon-btn" data-act="file-menu" title="الملف والحفظ"></button>
+        <div class="menu" id="fileMenu">
+          <button data-act="save-file"></button>
+          <button data-act="open-file"></button>
+          <button data-act="export-png"></button>
+          <button data-act="print"></button>
+          <hr />
+          <button data-act="dup-page"></button>
+          <button data-act="del-page"></button>
+          <button data-act="clear-page" class="danger"></button>
+        </div>
+      </div>
+      <button class="icon-btn" data-act="theme" title="تغيير لون السبورة"></button>
+      <button class="btn ghost install-btn" data-act="install" title="ثبّت مِداد كتطبيق على هذا الجهاز" hidden></button>
+      <button class="icon-btn" data-act="fullscreen" title="ملء الشاشة"></button>
+      <button class="icon-btn" data-act="settings" title="الإعدادات"></button>
+      <button class="icon-btn" data-act="about" title="عن التطبيق"></button>
+      <button class="icon-btn drawer-toggle" data-act="drawer" title="إظهار/إخفاء اللوحات"></button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- شريط الأدوات -->
+    <nav class="toolbar" id="toolbar" aria-label="أدوات الرسم"></nav>
+
+    <!-- السبورة -->
+    <section class="board-wrap" id="boardWrap">
+      <canvas id="board" aria-label="السبورة"></canvas>
+      <div class="board-texture"></div>
+      <div id="overlays"></div>
+
+      <!-- شريط الخصائص العائم -->
+      <div class="props" id="props">
+        <div class="swatches" id="swatches"></div>
+        <div class="props-sep"></div>
+        <label class="width-ctl" title="السُمك">
+          <span class="width-dot" id="widthDot"></span>
+          <input type="range" id="widthRange" min="1" max="24" value="3" />
+        </label>
+        <div class="props-sep"></div>
+        <button class="chip-btn" id="fillBtn" title="تعبئة الأشكال"></button>
+        <button class="chip-btn" id="dashBtn" title="خط متقطع"></button>
+        <button class="chip-btn" id="snapBtn" title="الالتصاق بالشبكة"></button>
+        <button class="chip-btn" id="inkBtn" title="التعرّف الذكي على الأشكال المرسومة باليد"></button>
+        <label class="sides-ctl" id="sidesCtl" title="عدد أضلاع المضلع">
+          <span>أضلاع</span>
+          <input type="number" id="sidesInp" min="3" max="12" value="6" />
+        </label>
+        <button class="chip-btn" id="symBtn" title="لوحة الرموز الرياضية العربية"></button>
+      </div>
+
+      <!-- شريط التحديد -->
+      <div class="sel-bar" id="selBar">
+        <button data-sel="read" title="اقرأ الكتابة اليدوية المحددة وحلّها"></button>
+        <button data-sel="dup" title="تكرار"></button>
+        <button data-sel="front" title="إلى الأمام"></button>
+        <button data-sel="color" title="تلوين باللون الحالي"></button>
+        <button data-sel="del" class="danger" title="حذف"></button>
+      </div>
+
+      <!-- لوحة الرموز -->
+      <div class="symbols" id="symbols"></div>
+    </section>
+
+    <!-- اللوحات الجانبية -->
+    <aside class="drawer" id="drawer">
+      <div class="drawer-tabs" id="drawerTabs" role="tablist"></div>
+      <div class="drawer-body" id="drawerBody"></div>
+    </aside>
+  </main>
+
+  <!-- شريط الحالة -->
+  <footer class="statusbar">
+    <div class="bg-picker" id="bgPicker"></div>
+    <div class="zoom-ctl">
+      <button class="icon-btn sm" data-act="zoom-out" title="تصغير"></button>
+      <button class="zoom-label" id="zoomLabel" data-act="zoom-reset" title="إعادة الضبط">١٠٠٪</button>
+      <button class="icon-btn sm" data-act="zoom-in" title="تكبير"></button>
+      <button class="icon-btn sm" data-act="zoom-fit" title="ملاءمة المحتوى"></button>
+    </div>
+    <div class="credit">تصميم وفكرة: <b>أ. عبدالرحيم مبارك الرحبي</b></div>
+  </footer>
+
+  <div id="modalRoot"></div>
+  <div id="toasts" aria-live="polite"></div>
+  <input type="file" id="fileInput" accept=".json,.midad,application/json" hidden />
+  <input type="file" id="imageInput" accept="image/*" hidden />
+
+  <script src="js/core.js"></script>
+  <script src="js/math-engine.js"></script>
+  <script src="js/math-plus.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/visual.js"></script>
+  <script src="js/circle.js"></script>
+  <script src="js/geo-extra.js"></script>
+  <script src="js/plot.js"></script>
+  <script src="js/curvefit.js"></script>
+  <script src="js/shape-rec.js"></script>
+  <script src="js/netfold.js"></script>
+  <script src="js/view3d.js"></script>
+  <script src="js/solids.js"></script>
+  <script src="js/space3d-math.js"></script>
+  <script src="js/space3d.js"></script>
+  <script src="js/shapes2d.js"></script>
+  <script src="js/overlays.js"></script>
+  <script src="js/ink-data.js"></script>
+  <script src="js/ink-hand.js"></script>
+  <script src="js/ink.js"></script>
+  <script src="js/ink-ui.js"></script>
+  <script src="js/assist-core.js"></script>
+  <script src="js/float3d.js"></script>
+  <script src="js/assist.js"></script>
+  <script src="js/modes.js"></script>
+  <script src="js/practice.js"></script>
+  <script src="js/skills.js"></script>
+  <script src="js/curriculum.js"></script>
+  <script src="js/pedagogy.js"></script>
+  <script src="js/qcard.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/nlu.js"></script>
+  <script src="js/panels/curriculum.js"></script>
+  <script src="js/panels/algebra.js"></script>
+  <script src="js/panels/geometry.js"></script>
+  <script src="js/panels/lab.js"></script>
+  <script src="js/panels/numbers.js"></script>
+  <script src="js/panels/stats.js"></script>
+  <script src="js/panels/tutor.js"></script>
+  <script src="js/panels/practice-panel.js"></script>
+  <script src="js/vendor/pico.js"></script>
+  <script src="js/vendor/facefinder.js"></script>
+  <script src="js/camera-picker.js"></script>
+  <script src="js/panels/classroom.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/board-ux.js"></script>
+  <script src="js/install.js"></script>
+  <script src="js/onboarding.js"></script>
+</body>
+</html>
